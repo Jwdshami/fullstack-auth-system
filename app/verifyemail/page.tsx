@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 
-const VerifyEmailPage = () => {
+// ✅ Inner component with all the logic
+function VerifyEmailContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
@@ -27,11 +28,10 @@ const VerifyEmailPage = () => {
     };
 
     useEffect(() => {
-        // ✅ token from useSearchParams is always in sync — no manual parsing needed
         if (token) {
             verifyEmail(token);
         } else {
-            setError(true); // no token in URL at all
+            setError(true);
         }
     }, [token]);
 
@@ -63,6 +63,17 @@ const VerifyEmailPage = () => {
             )}
         </div>
     );
-};
+}
 
-export default VerifyEmailPage;
+// ✅ Default export wraps in Suspense
+export default function VerifyEmailPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-gray-500 text-lg">Loading...</p>
+            </div>
+        }>
+            <VerifyEmailContent />
+        </Suspense>
+    );
+}

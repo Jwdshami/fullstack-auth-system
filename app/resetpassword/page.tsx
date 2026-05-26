@@ -1,11 +1,12 @@
 // app/resetpassword/page.tsx
 'use client';
-import { useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 
-const ResetPasswordPage = () => {
+// ✅ Inner component with all the logic
+function ResetPasswordContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
@@ -50,11 +51,9 @@ const ResetPasswordPage = () => {
             <h1 className="text-2xl font-bold">Reset Password</h1>
 
             {success ? (
-                <>
-                    <p className="text-green-500 font-medium">
-                        Password reset successfully! ✅ Redirecting to login...
-                    </p>
-                </>
+                <p className="text-green-500 font-medium">
+                    Password reset successfully! ✅ Redirecting to login...
+                </p>
             ) : (
                 <>
                     <input
@@ -95,6 +94,17 @@ const ResetPasswordPage = () => {
             )}
         </div>
     );
-};
+}
 
-export default ResetPasswordPage;
+// ✅ Default export wraps in Suspense
+export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-gray-500 text-lg">Loading...</p>
+            </div>
+        }>
+            <ResetPasswordContent />
+        </Suspense>
+    );
+}
